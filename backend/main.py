@@ -1,9 +1,51 @@
 
-from fastapi import FastAPI, HTTPException, Query
+import os
+import secrets
+
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Query, Depends, Security
+from fastapi.security import APIKeyHeader
 from sqlalchemy import text
 
 from backend.database import engine
 
+
+# --------------------------------------------------
+# ENVIRONMENT CONFIGURATION
+# --------------------------------------------------
+
+load_dotenv()
+
+
+# --------------------------------------------------
+# API KEY AUTHENTICATION
+# --------------------------------------------------
+
+api_key_header = APIKeyHeader(
+    name="X-API-Key",
+    auto_error=False,
+)
+
+
+def verify_api_key(api_key: str | None = Security(api_key_header)):
+    expected_key = os.getenv("SMART_SUPPORT_API_KEY")
+
+    if not expected_key:
+        raise HTTPException(
+            status_code=503,
+            detail="API authentication is not configured"
+        )
+
+    if not api_key or not secrets.compare_digest(api_key, expected_key):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or missing API key"
+        )
+
+
+# --------------------------------------------------
+# APPLICATION
+# --------------------------------------------------
 
 app = FastAPI(
     title="Smart Support Desk API",
@@ -13,7 +55,7 @@ app = FastAPI(
 
 
 # --------------------------------------------------
-# 1. HEALTH CHECK
+# 1. HEALTH CHECK - PUBLIC
 # --------------------------------------------------
 
 @app.get("/api/v1/health", tags=["System"])
@@ -28,10 +70,14 @@ def health():
 
 
 # --------------------------------------------------
-# 2. GET ORDER DETAILS
+# 2. GET ORDER DETAILS - PROTECTED
 # --------------------------------------------------
 
-@app.get("/api/v1/orders/{order_id}", tags=["Orders"])
+@app.get(
+    "/api/v1/orders/{order_id}",
+    tags=["Orders"],
+    dependencies=[Depends(verify_api_key)]
+)
 def get_order(order_id: str):
 
     query = text("""
@@ -66,10 +112,14 @@ def get_order(order_id: str):
 
 
 # --------------------------------------------------
-# 3. DETECT POTENTIAL CUSTOMER ISSUES
+# 3. DETECT POTENTIAL CUSTOMER ISSUES - PROTECTED
 # --------------------------------------------------
 
-@app.get("/api/v1/issues", tags=["Support Intelligence"])
+@app.get(
+    "/api/v1/issues",
+    tags=["Support Intelligence"],
+    dependencies=[Depends(verify_api_key)]
+)
 def get_potential_issues(
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
@@ -179,12 +229,13 @@ def get_potential_issues(
 
 
 # --------------------------------------------------
-# 4. GET CUSTOMER REVIEWS FOR AN ORDER
+# 4. GET CUSTOMER REVIEWS FOR AN ORDER - PROTECTED
 # --------------------------------------------------
 
 @app.get(
     "/api/v1/orders/{order_id}/reviews",
-    tags=["Investigation"]
+    tags=["Investigation"],
+    dependencies=[Depends(verify_api_key)]
 )
 def get_order_reviews(order_id: str):
 
@@ -216,12 +267,13 @@ def get_order_reviews(order_id: str):
 
 
 # --------------------------------------------------
-# 5. GET PRODUCTS PURCHASED IN AN ORDER
+# 5. GET PRODUCTS PURCHASED IN AN ORDER - PROTECTED
 # --------------------------------------------------
 
 @app.get(
     "/api/v1/orders/{order_id}/items",
-    tags=["Investigation"]
+    tags=["Investigation"],
+    dependencies=[Depends(verify_api_key)]
 )
 def get_order_items(order_id: str):
 
@@ -269,12 +321,13 @@ def get_order_items(order_id: str):
 
 
 # --------------------------------------------------
-# 6. GET CUSTOMER ORDER HISTORY
+# 6. GET CUSTOMER ORDER HISTORY - PROTECTED
 # --------------------------------------------------
 
 @app.get(
     "/api/v1/customers/{customer_unique_id}/orders",
-    tags=["Investigation"]
+    tags=["Investigation"],
+    dependencies=[Depends(verify_api_key)]
 )
 def get_customer_orders(
     customer_unique_id: str,
