@@ -7,14 +7,23 @@ from sqlalchemy.engine import URL
 
 load_dotenv()
 
-DATABASE_URL = URL.create(
-    drivername="postgresql+psycopg",
-    username=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    host=os.getenv("DB_HOST", "localhost"),
-    port=int(os.getenv("DB_PORT", "5432")),
-    database=os.getenv("DB_NAME"),
-)
+cloud_database_url = os.getenv("DATABASE_URL")
+
+if cloud_database_url:
+    DATABASE_URL = cloud_database_url.replace(
+        "postgres://", "postgresql+psycopg://", 1
+    ).replace(
+        "postgresql://", "postgresql+psycopg://", 1
+    )
+else:
+    DATABASE_URL = URL.create(
+        drivername="postgresql+psycopg",
+        username=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", "5432")),
+        database=os.getenv("DB_NAME"),
+    )
 
 engine = create_engine(
     DATABASE_URL,
