@@ -3,3 +3,5 @@ uvicorn
 SQLAlchemy
 psycopg[binary]
 python-dotenv
+deep-translator>=1.11.4,<2
+
