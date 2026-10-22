@@ -106,31 +106,31 @@ The application supports on-demand translation of Portuguese customer reviews in
 
 ### 1. Support Operations Dashboard
 
-![Support Operations Dashboard](https://github.com/user-attachments/assets/3d8cf3b5-aba0-419b-85da-7cd2b2d33851)
+![Support Operations Dashboard](https://github.com/user-attachments/assets/3575dd32-d779-416e-8950-b26846b48d81)
 
 Displays 17,822 detected potential support issues, priority distribution, and six issue categories.
 
 ### 2. Issue Explorer
 
-![Issue Explorer](https://github.com/user-attachments/assets/38844349-572e-434a-981e-c8086a52f1e0)
+![Issue Explorer](https://github.com/user-attachments/assets/2571b483-b7de-42ca-a663-ade6024d6332)
 
 Allows agents to search, filter, and investigate marketplace orders by issue category, priority, rating, and status.
 
 ### 3. Salesforce Case Management
 
-![Salesforce Case Management](https://github.com/user-attachments/assets/3575dd32-d779-416e-8950-b26846b48d81)
+![Salesforce Case Management](https://github.com/user-attachments/assets/3d8cf3b5-aba0-419b-85da-7cd2b2d33851)
 
 Displays synchronized Salesforce Cases with assigned priorities and source order references.
 
 ### 4. Salesforce Record-Triggered Flow
 
-![Salesforce Flow Builder](https://github.com/user-attachments/assets/6eb06ec0-1b07-4449-958e-bbbb906717da)
+![Salesforce Flow Builder](https://github.com/user-attachments/assets/38844349-572e-434a-981e-c8086a52f1e0)
 
 Shows the active High Priority Case Follow-Up Flow, configured to create follow-up Tasks for newly created high-priority Cases.
 
 ### 5. Salesforce Flow Trigger Explorer
 
-![Salesforce Flow Trigger Explorer](https://github.com/user-attachments/assets/2571b483-b7de-42ca-a663-ade6024d6332)
+![Salesforce Flow Trigger Explorer](https://github.com/user-attachments/assets/6eb06ec0-1b07-4449-958e-bbbb906717da)
 
 Confirms the high-priority Case Flow is registered and active as an after-save automation.
 
