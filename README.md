@@ -1,189 +1,409 @@
-
 # Smart Support Desk
 
 ### Salesforce-Powered Customer Support Intelligence & Case Management
 
-Smart Support Desk is an enterprise-style customer support application built using **Salesforce Lightning Web Components (LWC), Apex, Salesforce Flow, FastAPI, and PostgreSQL**.
+An end-to-end customer support intelligence application built with **Salesforce Lightning Web Components (LWC), Apex, Salesforce Flow, FastAPI, and PostgreSQL**.
 
-The application analyzes real e-commerce order and review data to identify potential customer-support issues, prioritize cases, investigate order histories, and automate follow-up workflows in Salesforce.
+Smart Support Desk analyzes real e-commerce transactions and customer reviews to identify potential support issues, prioritize cases, investigate order histories, and integrate support workflows with Salesforce Service Cloud capabilities.
+
+The project demonstrates Salesforce development, REST API integration, asynchronous processing, data-driven classification, and workflow automation using a real-world dataset.
+
+---
 
 ## Problem Statement
 
-Large e-commerce marketplaces process thousands of orders, making it difficult for support teams to identify customers experiencing delivery delays, poor experiences, canceled orders, or unresolved shipments.
+Large e-commerce marketplaces process thousands of orders, making it difficult for customer support teams to proactively identify delivery failures, negative customer experiences, canceled orders, and potentially unresolved shipments.
 
-Customer feedback and operational data often exist in separate systems, requiring agents to manually investigate orders before deciding which issues need attention.
+Order information, customer reviews, payment details, and delivery records are often distributed across different systems. Support agents must manually investigate these sources before determining which issues require attention.
 
-**Smart Support Desk addresses this problem by combining data-driven issue detection with Salesforce case management and workflow automation.**
+**Smart Support Desk addresses this problem by integrating marketplace data analysis with Salesforce-based case management and investigation workflows.**
+
+The system identifies potential support issues using historical transaction data, assigns rule-based priorities, provides a unified investigation interface, and supports synchronization into Salesforce Cases.
+
+---
 
 ## Key Features
 
 ### 1. Support Intelligence Dashboard
 
-- Displays **17,822 detected potential support issues** from the Olist dataset.
-- Provides priority-based metrics and issue-category breakdowns.
-- Supports filtering, searching, sorting, and pagination.
-- Categorizes issues using order status, delivery performance, and customer ratings.
+An interactive Salesforce Lightning dashboard for monitoring marketplace support concerns.
+
+- Identifies **17,822 potential support issues** from the Olist dataset.
+- Classifies **6,324 high-priority** and **11,498 medium-priority** issues.
+- Displays six evidence-based issue categories.
+- Provides category breakdowns and support metrics.
+- Supports searching, filtering, sorting, and paginated results.
+- Retrieves marketplace data through Apex-integrated REST APIs.
 
 ### 2. Order Investigation Workspace
 
-- Displays order and delivery details.
-- Retrieves customer information and order history.
-- Shows customer reviews and ratings.
-- Displays purchased products, sellers, and freight charges.
-- Retrieves payment information.
+A centralized investigation interface that allows support agents to examine individual marketplace orders.
+
+- Order status and delivery information
+- Customer details and order history
+- Customer reviews and ratings
+- Purchased products and seller information
+- Item prices and freight charges
+- Payment methods and transaction details
+- On-demand Portuguese-to-English review translation
+
+This reduces the need to investigate customer issues across multiple disconnected datasets.
 
 ### 3. Salesforce Case Synchronization
 
-- Converts detected marketplace issues into Salesforce Case records.
-- Uses asynchronous Apex Queueable processing.
-- Supports paginated synchronization in batches of 20.
-- Checks existing order-linked Cases to reduce duplicates.
-- Assigns priorities and stores references to source orders.
+Integrates detected marketplace issues with Salesforce's standard Case object.
 
-### 4. Automated High-Priority Follow-Ups
+- Creates Salesforce Cases from identified marketplace issues.
+- Uses **Queueable Apex** for asynchronous processing.
+- Processes synchronization requests in batches of up to 20.
+- Checks existing order-linked Cases to reduce duplicate creation.
+- Assigns Case priorities based on detected issue severity.
+- Stores original Olist order and customer identifiers in custom Case fields.
+- Makes synchronized records accessible through standard Salesforce Case views.
 
-- Uses Salesforce record-triggered Flow.
-- Automatically creates follow-up Tasks for high-priority Cases.
-- Links Tasks to their corresponding Salesforce Case records.
+### 4. High-Priority Follow-Up Automation
+
+Implements a Salesforce record-triggered Flow for high-priority support Cases.
+
+- Configured to execute when a Salesforce Case is created.
+- Evaluates the condition `Priority = High`.
+- Uses an after-save Create Records action to create a follow-up Task.
+- Configures the Task's subject, status, priority, and related Case reference.
+- Designed to support automatic investigation follow-ups.
+
+**Implementation status:** The Flow is configured, saved, and active in Salesforce. Successful automatic Task creation for newly synchronized Cases remains to be verified end to end.
 
 ### 5. REST API Integration
 
-- FastAPI provides endpoints for issue discovery, order investigation, reviews, payments, products, and customer history.
-- Apex integrates Salesforce with the external API using a Named Credential.
-- PostgreSQL stores and serves the underlying marketplace data.
+A Python FastAPI backend provides structured access to marketplace data stored in PostgreSQL.
 
-### 6. Portuguese Review Translation
+API capabilities include:
 
-- Includes an integration for translating Portuguese customer reviews into English.
-- Uses a Python translation library through a FastAPI endpoint.
+- Support issue discovery and classification
+- Aggregate issue metrics
+- Order and customer investigation
+- Customer review retrieval
+- Purchased item and seller details
+- Payment information
+- Customer order history
+- Customer review translation
+
+Salesforce communicates with the backend through **Apex HTTP callouts and a Named Credential**, keeping external API configuration separate from application logic.
+
+### 6. Portuguese-to-English Review Translation
+
+The application supports on-demand translation of Portuguese customer reviews into English.
+
+- Retrieves original customer review text from PostgreSQL.
+- Exposes a dedicated FastAPI translation endpoint.
+- Integrates with the external **MyMemory Translation API**.
+- Displays the English translation alongside the original review in Salesforce.
+- Preserves the original customer feedback for reference.
+
+---
+
+## Application Screenshots
+
+### Support Operations Dashboard
+
+![Support Operations Dashboard](<img width="1917" height="997" alt="Screenshot 2026-10-22 162439" src="https://github.com/user-attachments/assets/3d8cf3b5-aba0-419b-85da-7cd2b2d33851" />)
+
+Displays issue metrics, priority distribution, and category-level support intelligence.
+
+### Issue Explorer
+
+![Issue Explorer](<img width="1917" height="1026" alt="Screenshot 2026-10-22 161324" src="https://github.com/user-attachments/assets/38844349-572e-434a-981e-c8086a52f1e0" />)
+
+Allows support agents to search and filter potential issues by category, priority, rating, and order status.
+
+### Salesforce Case Management
+
+![Salesforce Cases](<img width="1912" height="1017" alt="Screenshot 2026-10-22 161055" src="https://github.com/user-attachments/assets/6eb06ec0-1b07-4449-958e-bbbb906717da" />)
+
+Shows marketplace issues synchronized into standard Salesforce Case records with assigned priorities.
+
+### Salesforce Record-Triggered Flow
+
+![Salesforce Flow Builder](<img width="1916" height="995" alt="Screenshot 2026-10-22 153410" src="https://github.com/user-attachments/assets/2571b483-b7de-42ca-a663-ade6024d6332" />)
+
+Shows the active high-priority Case Flow and its follow-up Task creation action.
+
+### Salesforce Flow Trigger Explorer
+
+![Flow Trigger Explorer](<img width="1916" height="932" alt="Screenshot 2026-10-22 152835" src="https://github.com/user-attachments/assets/3575dd32-d779-416e-8950-b26846b48d81" />)
+
+Shows the registered active after-save automation for newly created Salesforce Cases.
+
+---
 
 ## System Architecture
 
 ```text
-               Salesforce Lightning App
-                         |
-             Lightning Web Components
-                         |
-                 Apex Controllers
-                         |
-               Salesforce Named Credential
-                         |
-                  FastAPI REST API
-                         |
-                     PostgreSQL
-                         |
-              Olist E-Commerce Dataset
+                   Salesforce Lightning App
+                             |
+                  Lightning Web Components
+                             |
+                       Apex Services
+                             |
+                  Salesforce Named Credential
+                             |
+                        REST / HTTPS
+                             |
+                       FastAPI Backend
+                             |
+                         SQLAlchemy
+                             |
+                         PostgreSQL
+                             |
+                  Olist E-Commerce Dataset
 
-Salesforce Automation:
 
-Detected Issues
-      |
-      v
-Apex Queueable
-      |
-      v
-Salesforce Cases
-      |
-      v
-Record-Triggered Flow
-      |
-      v
-High-Priority Follow-Up Tasks
+                Salesforce Case Management
+                             |
+                    Queueable Apex
+                             |
+                     Salesforce Cases
+                             |
+                  Record-Triggered Flow
+                             |
+                High-Priority Follow-Up Task
+                    (Configured Automation)
+
+
+                  Review Translation
+                             |
+                   FastAPI Endpoint
+                             |
+                 MyMemory Translation API
 ```
+
+### Architecture Overview
+
+**Frontend:** Lightning Web Components provide the interactive dashboard and investigation interface inside Salesforce.
+
+**Salesforce application layer:** Apex services manage external API communication and asynchronous Case synchronization.
+
+**Backend:** FastAPI implements issue-detection logic, data retrieval, and review translation endpoints.
+
+**Database:** PostgreSQL stores the imported marketplace dataset, with SQLAlchemy handling database access.
+
+**Automation:** Salesforce Flow defines the follow-up workflow for high-priority Case creation.
+
+---
 
 ## Technology Stack
 
 | Layer | Technologies |
 |---|---|
 | Frontend | Salesforce LWC, HTML, CSS, JavaScript |
-| Salesforce Backend | Apex, SOQL, Queueable Apex |
-| Automation | Salesforce Flow |
-| API Backend | Python, FastAPI, SQLAlchemy |
+| Salesforce Development | Apex, SOQL, Queueable Apex |
+| Workflow Automation | Salesforce Flow |
+| Backend | Python, FastAPI, SQLAlchemy |
 | Database | PostgreSQL |
-| Integration | REST APIs, Salesforce Named Credentials |
-| Testing | Apex Unit Testing, HTTP Callout Mocking |
+| Integration | REST APIs, HTTP Callouts, Named Credentials |
+| Translation | MyMemory Translation API |
+| Testing | Apex Unit Tests, HTTP Callout Mocking |
 | Deployment | Salesforce Platform, Render |
 | Version Control | Git, GitHub |
+
+---
 
 ## Dataset
 
 **Source:** [Brazilian E-Commerce Public Dataset by Olist — Kaggle](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
 
-The project uses real historical Brazilian marketplace data, including:
+The application uses real historical Brazilian marketplace records, including customer orders, reviews, deliveries, payments, and product information.
 
-| Data | Records |
+| Dataset Table | Records |
 |---|---:|
-| Orders | 99,441 |
 | Customers | 99,441 |
+| Orders | 99,441 |
 | Order Items | 112,650 |
 | Payments | 103,886 |
 | Reviews | 99,224 |
 | Products | 32,951 |
 | Sellers | 3,095 |
+| Geolocation | 738,332 |
+| Category Translations | 71 |
 
-### Issue Detection
+### Issue Detection and Classification
 
-The application identifies potential support issues based on:
+The application identifies potential support concerns across six categories:
 
-- Low customer review ratings
-- Late deliveries
-- Low ratings combined with late deliveries
-- Canceled orders
-- Unavailable orders
-- Potentially overdue shipments
+| Issue Category | Detected Issues |
+|---|---:|
+| Low customer rating | 8,325 |
+| Late delivery | 2,548 |
+| Low rating and late delivery | 3,986 |
+| Canceled order | 625 |
+| Unavailable order | 609 |
+| Potentially overdue order | 1,729 |
+| **Total** | **17,822** |
 
-These are **rule-derived potential issues**, not verified customer-submitted support tickets. The historical dataset is used for demonstration and analysis.
+Issue classification is based on recorded order statuses, review ratings, and delivery timestamps.
+
+The system uses **deterministic, rule-based classification**, not a trained machine-learning model.
+
+**Data interpretation:** These records represent potential support issues inferred from historical transactions, not verified customer-submitted support tickets. Potentially overdue orders are evaluated relative to the historical dataset snapshot rather than the current date.
+
+---
+
+## Salesforce Implementation
+
+### Lightning Web Components
+
+The Salesforce frontend provides:
+
+- Support dashboard and issue metrics
+- Searchable and filterable issue explorer
+- Detailed order investigation
+- Customer review and payment information
+- Review translation display
+- Actions for interacting with synchronized support records
+
+### Apex Services
+
+The Salesforce application includes Apex services responsible for:
+
+- Calling external FastAPI endpoints
+- Handling HTTP responses
+- Processing marketplace data
+- Creating Salesforce Case records
+- Running asynchronous synchronization operations
+
+### Salesforce Data Model
+
+The project uses Salesforce's standard **Case** object with custom fields to preserve references to marketplace data.
+
+Examples include:
+
+- Olist Order ID
+- Olist Customer ID
+- Issue Reason
+- Review Rating
+- Delivery Delayed
+
+Standard Salesforce fields such as Subject, Status, Priority, and Case Owner support Case management.
+
+### Salesforce Flow
+
+The high-priority follow-up Flow uses:
+
+- **Flow Type:** Record-Triggered Flow
+- **Object:** Case
+- **Trigger:** Record Created
+- **Entry Condition:** Priority Equals High
+- **Execution:** After Save
+- **Action:** Create Task Record
+
+The Task action is configured to link the follow-up activity to the originating Case.
+
+---
+
+## Testing and Verification
+
+### Verified Functionality
+
+- Salesforce LWC dashboard displays issue metrics retrieved from the backend.
+- Issue Explorer supports filtering and investigation of marketplace orders.
+- FastAPI endpoints retrieve related customer, review, product, and payment data.
+- Salesforce Case synchronization creates Cases containing Olist source identifiers.
+- Asynchronous Apex synchronization has completed successfully.
+- Portuguese-to-English review translation displays successfully in the Salesforce interface.
+- An Apex HTTP callout mock unit test has passed.
+- The high-priority Case Flow is configured and active in Salesforce.
+
+### Remaining Validation
+
+- End-to-end verification that the active Flow automatically creates Tasks for newly created high-priority Cases.
+- Broader automated testing for Apex synchronization and edge cases.
+- Retry and failure-handling scenarios for external integrations.
+
+---
+
+## Deployment
+
+The system uses two deployed application components.
+
+**Salesforce Platform**
+
+Hosts the Lightning application, LWC dashboard, Apex services, Case records, and record-triggered automation.
+
+**Render**
+
+Hosts the FastAPI backend that provides marketplace investigation and issue-detection endpoints.
+
+**Backend URL:** https://smart-support-desk.onrender.com
+
+**API Documentation:** https://smart-support-desk.onrender.com/docs
+
+The Salesforce application requires access to an appropriately configured Salesforce development org.
+
+---
 
 ## Project Structure
 
 ```text
 smart-support-desk/
-├── backend/             # FastAPI backend and API routes
-├── salesforce/          # Salesforce DX project
+├── backend/
+│   └── ...
+├── salesforce/
 │   └── force-app/
 │       └── main/
 │           └── default/
-│               ├── classes/   # Apex services and tests
-│               └── lwc/       # Lightning Web Components
-├── scripts/             # Data preparation and import utilities
-└── requirements.txt     # Python dependencies
+│               ├── classes/
+│               └── lwc/
+├── scripts/
+├── screenshots/
+│   ├── 01-support-dashboard.png
+│   ├── 02-issue-explorer.png
+│   ├── 03-salesforce-cases.png
+│   ├── 04-salesforce-flow.png
+│   └── 05-flow-trigger-explorer.png
+└── requirements.txt
 ```
 
-## Testing and Verification
-
-The following workflows have been verified in the deployed application:
-
-- Dashboard retrieves and displays issue data.
-- Order Investigation loads related marketplace records.
-- Salesforce Case synchronization creates order-linked Cases.
-- Asynchronous synchronization job completes without execution errors.
-- High-priority Case Flow creates related follow-up Tasks.
-- Apex API service mock test passes (1 test executed, 100% pass rate).
-
-## Deployment
-
-The application consists of two deployed components:
-
-**Salesforce:** Hosts the Lightning application, LWC dashboard, Apex services, Salesforce Cases, and automation.
-
-**Render:** Hosts the FastAPI backend, which communicates with PostgreSQL.
+---
 
 ## Local Development
 
+### Backend Setup
+
 1. Clone the repository.
-2. Create a Python virtual environment.
-3. Install dependencies using `pip install -r requirements.txt`.
-4. Configure the required backend environment variables securely.
-5. Provision PostgreSQL and import the Olist dataset using the project's data scripts.
-6. Authenticate a Salesforce development org using Salesforce CLI.
-7. Deploy the Salesforce metadata using Salesforce CLI.
-8. Configure the Salesforce Named Credential to connect securely to the backend.
+
+2. Create and activate a Python virtual environment.
+
+3. Install Python dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Configure the backend environment variables required for PostgreSQL and API authentication.
+
+5. Provision PostgreSQL and import the Olist dataset using the project's data preparation and import scripts.
+
+6. Start the FastAPI development server using the backend application's configured entry point.
+
+### Salesforce Setup
+
+1. Install Salesforce CLI and authenticate a development org.
+2. Deploy the Salesforce DX project metadata.
+3. Configure the Named Credential for the FastAPI backend.
+4. Configure the API authentication settings securely.
+5. Verify the Lightning application and Apex integration.
+6. Review and activate the record-triggered Flow where required.
+
+---
 
 ## Future Improvements
 
-- More comprehensive automated test coverage.
-- Durable synchronization progress tracking and retry handling.
-- Additional case assignment and escalation rules.
-- Improved customer-review translation reliability.
+- Expand automated Apex and backend integration test coverage.
+- Validate and strengthen high-priority Task automation.
+- Implement durable synchronization progress tracking.
+- Add retry handling and failure recovery for synchronization jobs.
+- Introduce configurable Case assignment and escalation rules.
+- Improve translation reliability through caching and fallback providers.
+- Add more detailed operational monitoring and error reporting.
 
 ---
