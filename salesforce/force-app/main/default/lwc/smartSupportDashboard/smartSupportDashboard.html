@@ -1,0 +1,585 @@
+
+<template>
+    <lightning-card title="Smart Support Desk" icon-name="standard:case">
+        <div class="dashboard">
+
+            <!-- HEADER -->
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="dashboard-title">Support Operations</h1>
+                    <p class="dashboard-subtitle">
+                        E-commerce issue intelligence and case investigation
+                    </p>
+                </div>
+                <lightning-button
+                    label="Refresh Dashboard"
+                    icon-name="utility:refresh"
+                    onclick={handleRefresh}
+                    disabled={loading}>
+                </lightning-button>
+            </div>
+
+            <!-- SUMMARY METRICS -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <p class="metric-label">Detected Issues</p>
+                    <p class="metric-value">{totalIssues}</p>
+                    <p class="metric-description">
+                        Orders requiring review
+                    </p>
+                </div>
+
+                <div class="metric-card">
+                    <p class="metric-label">High Priority</p>
+                    <p class="metric-value">{highPriorityCount}</p>
+                    <p class="metric-description">
+                        Priority based on recorded signals
+                    </p>
+                </div>
+
+                <div class="metric-card">
+                    <p class="metric-label">Medium Priority</p>
+                    <p class="metric-value">{mediumPriorityCount}</p>
+                    <p class="metric-description">
+                        Potential support concerns
+                    </p>
+                </div>
+
+                <div class="metric-card">
+                    <p class="metric-label">Issue Categories</p>
+                    <p class="metric-value">{categoryCount}</p>
+                    <p class="metric-description">
+                        Evidence-based classifications
+                    </p>
+                </div>
+            </div>
+
+            <!-- CATEGORY OVERVIEW -->
+            <section class="section-card">
+                <h2 class="section-title">Issue Breakdown</h2>
+                <div class="details-grid">
+                    <template for:each={categoryBreakdown} for:item="category">
+                        <div class="detail-card" key={category.name}>
+                            <div class="detail-row">
+                                <span class="detail-label">{category.name}</span>
+                                <span class="detail-value">{category.count}</span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <!-- SALESFORCE CASE SYNCHRONIZATION -->
+            <section class="section-card">
+                <div class="toolbar">
+                    <div>
+                        <h2 class="section-title">Salesforce Case Synchronization</h2>
+                        <p class="dashboard-subtitle">
+                            Queue detected marketplace issues for Salesforce Case creation.
+                            Existing Cases are checked to reduce duplicates.
+                        </p>
+                    </div>
+                </div>
+
+                <p class="dashboard-subtitle slds-m-bottom_small">
+                    {syncProgressLabel}
+                </p>
+
+                <div class="filter-actions">
+                    <lightning-button
+                        label="Sync Next 20 Issues"
+                        variant="brand"
+                        icon-name="utility:sync"
+                        onclick={handleSyncCases}
+                        disabled={disableSync}>
+                    </lightning-button>
+
+                    <lightning-button
+                        label="Restart from First Batch"
+                        onclick={handleResetSyncOffset}
+                        disabled={syncLoading}>
+                    </lightning-button>
+
+                    <lightning-button
+                        label="Open Salesforce Cases"
+                        icon-name="standard:case"
+                        onclick={handleOpenCases}>
+                    </lightning-button>
+                </div>
+
+                <template lwc:if={syncLoading}>
+                    <div class="loading-container">
+                        <lightning-spinner
+                            alternative-text="Submitting Case synchronization job"
+                            size="small">
+                        </lightning-spinner>
+                    </div>
+                </template>
+
+                <template lwc:if={syncMessage}>
+                    <p class="dashboard-subtitle slds-m-top_small">
+                        {syncMessage}
+                    </p>
+                </template>
+
+                <template lwc:if={syncError}>
+                    <div class="error-message slds-m-top_small">
+                        {syncError}
+                    </div>
+                </template>
+
+                <p class="dashboard-subtitle slds-m-top_small">
+                    A queued job is not confirmation that Cases were created.
+                    Verify the job and Cases before submitting another batch.
+                </p>
+            </section>
+
+            <!-- ISSUE EXPLORER -->
+            <section class="section-card">
+                <div class="toolbar">
+                    <div>
+                        <h2 class="section-title">Issue Explorer</h2>
+                        <p class="dashboard-subtitle">
+                            Search, filter and investigate real marketplace orders
+                        </p>
+                    </div>
+                    <lightning-button
+                        label="Clear Filters"
+                        onclick={handleClearFilters}>
+                    </lightning-button>
+                </div>
+
+                <div class="filters-grid">
+                    <lightning-input
+                        type="search"
+                        label="Order / Customer ID"
+                        value={searchTerm}
+                        onchange={handleSearchChange}>
+                    </lightning-input>
+
+                    <lightning-combobox
+                        label="Issue Category"
+                        value={issueType}
+                        options={issueTypeOptions}
+                        onchange={handleIssueTypeChange}>
+                    </lightning-combobox>
+
+                    <lightning-combobox
+                        label="Priority"
+                        value={priority}
+                        options={priorityOptions}
+                        onchange={handlePriorityChange}>
+                    </lightning-combobox>
+
+                    <lightning-combobox
+                        label="Review Rating"
+                        value={rating}
+                        options={ratingOptions}
+                        onchange={handleRatingChange}>
+                    </lightning-combobox>
+
+                    <lightning-combobox
+                        label="Order Status"
+                        value={orderStatus}
+                        options={orderStatusOptions}
+                        onchange={handleOrderStatusChange}>
+                    </lightning-combobox>
+
+                    <lightning-combobox
+                        label="Sort / View"
+                        value={sortMode}
+                        options={sortOptions}
+                        onchange={handleSortChange}>
+                    </lightning-combobox>
+
+                    <div class="filter-actions">
+                        <lightning-button
+                            label="Apply Filters"
+                            variant="brand"
+                            onclick={handleApplyFilters}
+                            disabled={loading}>
+                        </lightning-button>
+                    </div>
+                </div>
+
+                <template lwc:if={loading}>
+                    <div class="loading-container">
+                        <lightning-spinner
+                            alternative-text="Loading issues"
+                            size="medium">
+                        </lightning-spinner>
+                    </div>
+                </template>
+
+                <template lwc:if={error}>
+                    <div class="error-message">{error}</div>
+                </template>
+
+                <template lwc:if={hasIssues}>
+                    <div class="table-container">
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Order ID</th>
+                                    <th scope="col">Issue Category</th>
+                                    <th scope="col">Priority</th>
+                                    <th scope="col">Rating</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Location</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <template for:each={formattedIssues} for:item="issue">
+                                    <tr key={issue.order_id}>
+                                        <td>
+                                            <span class="order-id">
+                                                {issue.order_id}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="issue-badge">
+                                                {issue.issue_reason}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class={issue.priorityClass}>
+                                                {issue.priority}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="rating">
+                                                {issue.ratingDisplay}
+                                            </span>
+                                        </td>
+                                        <td>{issue.order_status}</td>
+                                        <td>{issue.locationDisplay}</td>
+                                        <td>
+                                            <lightning-button
+                                                label="Investigate"
+                                                variant="brand-outline"
+                                                data-id={issue.order_id}
+                                                onclick={handleSelectIssue}>
+                                            </lightning-button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+                        <span class="pagination-info">
+                            Showing {rangeStart} - {rangeEnd} of {filteredTotal}
+                        </span>
+
+                        <div class="filter-actions">
+                            <lightning-button
+                                label="Previous"
+                                onclick={handlePrevious}
+                                disabled={disablePrevious}>
+                            </lightning-button>
+
+                            <span>Page {pageNumber}</span>
+
+                            <lightning-button
+                                label="Next"
+                                onclick={handleNext}
+                                disabled={disableNext}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                </template>
+
+                <template lwc:if={showEmptyState}>
+                    <div class="empty-state">
+                        No matching issues found. Try adjusting the filters.
+                    </div>
+                </template>
+            </section>
+
+            <!-- INVESTIGATION WORKSPACE -->
+            <template lwc:if={hasSelection}>
+                <section class="details-panel">
+                    <div class="details-header">
+                        <div>
+                            <h2 class="section-title">Order Investigation</h2>
+                            <p class="dashboard-subtitle">
+                                Order: {selectedOrderId}
+                            </p>
+                            <p class="dashboard-subtitle">
+                                Customer: {selectedCustomerId}
+                            </p>
+                        </div>
+
+                        <lightning-button
+                            label="Close Investigation"
+                            onclick={handleCloseDetails}>
+                        </lightning-button>
+                    </div>
+
+                    <template lwc:if={detailLoading}>
+                        <div class="loading-container">
+                            <lightning-spinner
+                                alternative-text="Loading investigation"
+                                size="medium">
+                            </lightning-spinner>
+                        </div>
+                    </template>
+
+                    <template lwc:if={detailError}>
+                        <div class="error-message">{detailError}</div>
+                    </template>
+
+                    <div class="details-grid">
+
+                        <!-- ORDER -->
+                        <div class="detail-card">
+                            <h3>Order &amp; Delivery</h3>
+                            <template lwc:if={orderDetails}>
+                                <div class="detail-row">
+                                    <span class="detail-label">Status</span>
+                                    <span class="detail-value">
+                                        {orderDetails.order_status}
+                                    </span>
+                                </div>
+
+                                <div class="detail-row">
+                                    <span class="detail-label">Purchased</span>
+                                    <span class="detail-value">
+                                        {orderDetails.order_purchase_timestamp}
+                                    </span>
+                                </div>
+
+                                <div class="detail-row">
+                                    <span class="detail-label">Estimated Delivery</span>
+                                    <span class="detail-value">
+                                        {orderDetails.order_estimated_delivery_date}
+                                    </span>
+                                </div>
+
+                                <div class="detail-row">
+                                    <span class="detail-label">Actual Delivery</span>
+                                    <span class="detail-value">
+                                        {orderDetails.order_delivered_customer_date}
+                                    </span>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- CUSTOMER -->
+                        <div class="detail-card">
+                            <h3>Customer Profile</h3>
+                            <template lwc:if={orderDetails}>
+                                <div class="detail-row">
+                                    <span class="detail-label">Customer ID</span>
+                                    <span class="detail-value">
+                                        {orderDetails.customer_unique_id}
+                                    </span>
+                                </div>
+
+                                <div class="detail-row">
+                                    <span class="detail-label">City</span>
+                                    <span class="detail-value">
+                                        {orderDetails.customer_city}
+                                    </span>
+                                </div>
+
+                                <div class="detail-row">
+                                    <span class="detail-label">State</span>
+                                    <span class="detail-value">
+                                        {orderDetails.customer_state}
+                                    </span>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- REVIEWS AND TRANSLATION -->
+                        <div class="detail-card">
+                            <h3>Customer Reviews</h3>
+
+                            <template lwc:if={translationError}>
+                                <div class="error-message">
+                                    {translationError}
+                                </div>
+                            </template>
+
+                            <template lwc:if={hasReviews}>
+                                <template for:each={reviewRows} for:item="review">
+                                    <div class="review-card" key={review.review_id}>
+                                        <p class="rating">
+                                            Rating: {review.review_score}/5
+                                        </p>
+
+                                        <p class="review-text">
+                                            {review.review_comment_title}
+                                        </p>
+
+                                        <p class="review-text">
+                                            {review.review_comment_message}
+                                        </p>
+
+                                        <p class="dashboard-subtitle">
+                                            {review.review_creation_date}
+                                        </p>
+
+                                        <template lwc:if={review.hasReviewText}>
+                                            <div class="slds-m-top_small">
+                                                <lightning-button
+                                                    label="Translate to English"
+                                                    icon-name="utility:translate"
+                                                    variant="neutral"
+                                                    data-id={review.review_id}
+                                                    onclick={handleTranslateReview}
+                                                    disabled={review.disableTranslate}>
+                                                </lightning-button>
+                                            </div>
+                                        </template>
+
+                                        <template lwc:if={review.isTranslating}>
+                                            <div class="slds-m-top_small">
+                                                <lightning-spinner
+                                                    alternative-text="Translating review"
+                                                    size="small">
+                                                </lightning-spinner>
+                                            </div>
+                                        </template>
+
+                                        <template lwc:if={review.hasTranslation}>
+                                            <div class="slds-m-top_medium">
+                                                <p>
+                                                    <strong>English Translation</strong>
+                                                </p>
+
+                                                <template lwc:if={review.translatedTitle}>
+                                                    <p class="review-text">
+                                                        {review.translatedTitle}
+                                                    </p>
+                                                </template>
+
+                                                <template lwc:if={review.translatedMessage}>
+                                                    <p class="review-text">
+                                                        {review.translatedMessage}
+                                                    </p>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </template>
+
+                            <template lwc:else>
+                                <p class="dashboard-subtitle">
+                                    No customer reviews recorded.
+                                </p>
+                            </template>
+                        </div>
+
+                        <!-- PRODUCTS -->
+                        <div class="detail-card">
+                            <h3>Purchased Products</h3>
+
+                            <template lwc:if={hasItems}>
+                                <template for:each={itemRows} for:item="item">
+                                    <div class="product-card" key={item.order_item_id}>
+                                        <p>
+                                            <strong>Category:</strong>
+                                            {item.product_category}
+                                        </p>
+                                        <p>
+                                            <strong>Price:</strong>
+                                            R$ {item.price}
+                                        </p>
+                                        <p>
+                                            <strong>Freight:</strong>
+                                            R$ {item.freight_value}
+                                        </p>
+                                        <p>
+                                            <strong>Seller:</strong>
+                                            {item.seller_id}
+                                        </p>
+                                    </div>
+                                </template>
+                            </template>
+
+                            <template lwc:else>
+                                <p class="dashboard-subtitle">
+                                    No purchased items recorded.
+                                </p>
+                            </template>
+                        </div>
+
+                        <!-- PAYMENTS -->
+                        <div class="detail-card">
+                            <h3>Payment Information</h3>
+
+                            <template lwc:if={hasPayments}>
+                                <template for:each={paymentRows} for:item="payment">
+                                    <div class="product-card" key={payment.key}>
+                                        <p>
+                                            <strong>Method:</strong>
+                                            {payment.payment_type}
+                                        </p>
+                                        <p>
+                                            <strong>Value:</strong>
+                                            R$ {payment.payment_value}
+                                        </p>
+                                        <p>
+                                            <strong>Installments:</strong>
+                                            {payment.payment_installments}
+                                        </p>
+                                    </div>
+                                </template>
+                            </template>
+
+                            <template lwc:else>
+                                <p class="dashboard-subtitle">
+                                    No payment records found.
+                                </p>
+                            </template>
+                        </div>
+
+                        <!-- CUSTOMER HISTORY -->
+                        <div class="detail-card">
+                            <h3>Customer Order History</h3>
+
+                            <template lwc:if={hasCustomerOrders}>
+                                <template for:each={customerOrderRows} for:item="history">
+                                    <div class="history-card" key={history.order_id}>
+                                        <p class="order-id">
+                                            {history.order_id}
+                                        </p>
+                                        <p>
+                                            <strong>Status:</strong>
+                                            {history.order_status}
+                                        </p>
+                                        <p>
+                                            <strong>Purchased:</strong>
+                                            {history.order_purchase_timestamp}
+                                        </p>
+                                    </div>
+                                </template>
+                            </template>
+
+                            <template lwc:else>
+                                <p class="dashboard-subtitle">
+                                    No order history found.
+                                </p>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions slds-m-top_large">
+                        <lightning-button
+                            label="Open Salesforce Cases"
+                            icon-name="standard:case"
+                            onclick={handleOpenCases}>
+                        </lightning-button>
+                    </div>
+                </section>
+            </template>
+
+        </div>
+    </lightning-card>
+</template>

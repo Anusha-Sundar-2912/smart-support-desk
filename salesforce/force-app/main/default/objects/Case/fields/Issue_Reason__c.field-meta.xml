@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Issue_Reason__c</fullName>
+    <description>Initial reason an order was flagged by the Smart Support Desk issue detection API.</description>
+    <inlineHelpText>Indicates whether the order was flagged for a low rating, late delivery, or both.</inlineHelpText>
+    <label>Issue Reason</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Low customer rating</fullName>
+                <default>false</default>
+                <label>Low customer rating</label>
+            </value>
+            <value>
+                <fullName>Late delivery</fullName>
+                <default>false</default>
+                <label>Late delivery</label>
+            </value>
+            <value>
+                <fullName>Low rating and late delivery</fullName>
+                <default>false</default>
+                <label>Low rating and late delivery</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
