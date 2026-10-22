@@ -65,13 +65,10 @@ Integrates detected marketplace issues with Salesforce's standard Case object.
 
 Implements a Salesforce record-triggered Flow for high-priority support Cases.
 
-- Configured to execute when a Salesforce Case is created.
-- Evaluates the condition `Priority = High`.
-- Uses an after-save Create Records action to create a follow-up Task.
-- Configures the Task's subject, status, priority, and related Case reference.
-- Designed to support automatic investigation follow-ups.
-
-**Implementation status:** The Flow is configured, saved, and active in Salesforce. Successful automatic Task creation for newly synchronized Cases remains to be verified end to end.
+- Runs when a Salesforce Case is created with `Priority = High`.
+- Creates a follow-up Task using an after-save record-triggered Flow.
+- Sets the Task subject, priority, and status, and links it to the source Case.
+- Supports follow-up tracking for high-priority marketplace support issues.
 
 ### 5. REST API Integration
 
@@ -162,7 +159,6 @@ Shows the active record-triggered Flow configured to create follow-up Tasks for 
                   Record-Triggered Flow
                              |
                 High-Priority Follow-Up Task
-                    (Configured Automation)
 
 
                   Review Translation
@@ -306,13 +302,7 @@ The Task action is configured to link the follow-up activity to the originating 
 - Asynchronous Apex synchronization has completed successfully.
 - Portuguese-to-English review translation displays successfully in the Salesforce interface.
 - An Apex HTTP callout mock unit test has passed.
-- The high-priority Case Flow is configured and active in Salesforce.
-
-### Remaining Validation
-
-- End-to-end verification that the active Flow automatically creates Tasks for newly created high-priority Cases.
-- Broader automated testing for Apex synchronization and edge cases.
-- Retry and failure-handling scenarios for external integrations.
+- The record-triggered Salesforce Flow is active, and Flow Debug confirmed the high-priority entry condition, Task field values, and source Case association.
 
 ---
 
@@ -394,7 +384,6 @@ smart-support-desk/
 ## Future Improvements
 
 - Expand automated Apex and backend integration test coverage.
-- Validate and strengthen high-priority Task automation.
 - Implement durable synchronization progress tracking.
 - Add retry handling and failure recovery for synchronization jobs.
 - Introduce configurable Case assignment and escalation rules.
