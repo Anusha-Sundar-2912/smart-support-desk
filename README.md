@@ -104,35 +104,35 @@ The application supports on-demand translation of Portuguese customer reviews in
 
 ## Application Screenshots
 
-### Support Operations Dashboard
+### 1. Support Operations Dashboard
 
 ![Support Operations Dashboard](https://github.com/user-attachments/assets/3d8cf3b5-aba0-419b-85da-7cd2b2d33851)
 
-Displays issue metrics, priority distribution, and category-level support intelligence.
+Displays 17,822 detected potential support issues, priority distribution, and six issue categories.
 
-### Issue Explorer
+### 2. Issue Explorer
 
 ![Issue Explorer](https://github.com/user-attachments/assets/38844349-572e-434a-981e-c8086a52f1e0)
 
-Allows support agents to search and filter potential issues by category, priority, rating, and order status.
+Allows agents to search, filter, and investigate marketplace orders by issue category, priority, rating, and status.
 
-### Salesforce Case Management
+### 3. Salesforce Case Management
 
-![Salesforce Cases](https://github.com/user-attachments/assets/6eb06ec0-1b07-4449-958e-bbbb906717da)
+![Salesforce Case Management](https://github.com/user-attachments/assets/3575dd32-d779-416e-8950-b26846b48d81)
 
-Shows marketplace issues synchronized into standard Salesforce Case records with assigned priorities.
+Displays synchronized Salesforce Cases with assigned priorities and source order references.
 
-### Salesforce Record-Triggered Flow
+### 4. Salesforce Record-Triggered Flow
 
-![Salesforce Flow Builder](https://github.com/user-attachments/assets/2571b483-b7de-42ca-a663-ade6024d6332)
+![Salesforce Flow Builder](https://github.com/user-attachments/assets/6eb06ec0-1b07-4449-958e-bbbb906717da)
 
-Shows the active high-priority Case Flow and its follow-up Task creation action.
+Shows the active High Priority Case Follow-Up Flow, configured to create follow-up Tasks for newly created high-priority Cases.
 
-### Salesforce Flow Trigger Explorer
+### 5. Salesforce Flow Trigger Explorer
 
-![Flow Trigger Explorer](https://github.com/user-attachments/assets/3575dd32-d779-416e-8950-b26846b48d81)
+![Salesforce Flow Trigger Explorer](https://github.com/user-attachments/assets/2571b483-b7de-42ca-a663-ade6024d6332)
 
-Shows the registered active after-save automation for newly created Salesforce Cases.
+Confirms the high-priority Case Flow is registered and active as an after-save automation.
 
 ---
 
