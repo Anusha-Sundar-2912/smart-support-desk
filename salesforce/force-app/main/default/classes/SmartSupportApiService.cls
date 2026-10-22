@@ -10,16 +10,20 @@ public with sharing class SmartSupportApiService {
 
     private static String sendGetRequest(String path) {
         HttpRequest req = new HttpRequest();
+
         req.setEndpoint(BASE_URL + path);
         req.setMethod('GET');
-        req.setTimeout(30000);
+
+        // Allow additional time for Render free-tier cold starts.
+        req.setTimeout(120000);
 
         HttpResponse res = new Http().send(req);
 
         if (res.getStatusCode() != 200) {
             throw new AuraHandledException(
                 'Smart Support API returned HTTP ' +
-                res.getStatusCode() + ': ' + res.getBody()
+                res.getStatusCode() + ': ' +
+                res.getBody()
             );
         }
 
@@ -34,13 +38,11 @@ public with sharing class SmartSupportApiService {
     // ISSUE SYNCHRONIZATION
     // --------------------------------------------------
 
-    // Used by existing Case synchronization.
     @AuraEnabled
     public static String getIssues(Integer limitSize) {
         return getIssuesPaginated(limitSize, 0);
     }
 
-    // Used by paginated Case synchronization.
     @AuraEnabled
     public static String getIssuesPaginated(
         Integer limitSize,
@@ -225,7 +227,7 @@ public with sharing class SmartSupportApiService {
     }
 
     // --------------------------------------------------
-    // PORTUGUESE -> ENGLISH REVIEW TRANSLATION
+    // PORTUGUESE TO ENGLISH REVIEW TRANSLATION
     // --------------------------------------------------
 
     @AuraEnabled
