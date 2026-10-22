@@ -4,8 +4,9 @@ import logging
 import secrets
 from functools import lru_cache
 from typing import Literal
+from html import unescape
 
-from deep_translator import GoogleTranslator
+import requests
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Query, Security
 from fastapi.concurrency import run_in_threadpool
@@ -536,11 +537,36 @@ def get_customer_orders(
 
 @lru_cache(maxsize=512)
 def translate_review_text(original_text: str) -> str:
-    """Translate an original review without modifying stored data."""
-    return GoogleTranslator(
-        source="pt",
-        target="en",
-    ).translate(original_text)
+    """Translate Portuguese reviews to English without changing stored data."""
+    if not original_text.strip():
+        return ""
+
+    response = requests.get(
+        "https://api.mymemory.translated.net/get",
+        params={
+            "q": original_text,
+            "langpair": "pt|en",
+        },
+        timeout=15,
+    )
+    response.raise_for_status()
+
+    result = response.json()
+
+    if int(result.get("responseStatus", 0)) != 200:
+        raise RuntimeError(
+            result.get("responseDetails")
+            or "Translation service unavailable"
+        )
+
+    translated_text = result.get(
+        "responseData", {}
+    ).get("translatedText")
+
+    if not translated_text:
+        raise RuntimeError("Translation service returned empty text")
+
+    return unescape(translated_text)
 
 
 @app.get(
