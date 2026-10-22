@@ -57,8 +57,6 @@ Customer feedback and operational data often exist in separate systems, requirin
 - Includes an integration for translating Portuguese customer reviews into English.
 - Uses a Python translation library through a FastAPI endpoint.
 
-*Note: Live translation functionality requires final verification.*
-
 ## System Architecture
 
 ```text
@@ -170,8 +168,6 @@ The application consists of two deployed components:
 
 **Render:** Hosts the FastAPI backend, which communicates with PostgreSQL.
 
-Salesforce authentication is required to access the Lightning application. The GitHub repository provides the source code; it is not a public Salesforce dashboard.
-
 ## Local Development
 
 1. Clone the repository.
@@ -183,8 +179,6 @@ Salesforce authentication is required to access the Lightning application. The G
 7. Deploy the Salesforce metadata using Salesforce CLI.
 8. Configure the Salesforce Named Credential to connect securely to the backend.
 
-Do not commit API keys, database credentials, or Salesforce authentication files.
-
 ## Future Improvements
 
 - More comprehensive automated test coverage.
@@ -193,5 +187,3 @@ Do not commit API keys, database credentials, or Salesforce authentication files
 - Improved customer-review translation reliability.
 
 ---
-
-*Built as a practical full-stack Salesforce engineering project demonstrating enterprise integrations, customer support workflows, and data-driven case management.*
