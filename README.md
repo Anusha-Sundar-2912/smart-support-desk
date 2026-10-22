@@ -106,7 +106,7 @@ The application supports on-demand translation of Portuguese customer reviews in
 
 ### 1. Support Operations Dashboard
 
-![Support Operations Dashboard](https://github.com/user-attachments/assets/3575dd32-d779-416e-8950-b26846b48d81)
+![Support Operations Dashboard](https://github.com/user-attachments/assets/3d8cf3b5-aba0-419b-85da-7cd2b2d33851)
 
 Displays 17,822 detected potential support issues, priority distribution, and six issue categories.
 
@@ -118,7 +118,7 @@ Allows agents to search, filter, and investigate marketplace orders by issue cat
 
 ### 3. Salesforce Case Management
 
-![Salesforce Case Management](https://github.com/user-attachments/assets/3d8cf3b5-aba0-419b-85da-7cd2b2d33851)
+![Salesforce Case Management](https://github.com/user-attachments/assets/3575dd32-d779-416e-8950-b26846b48d81)
 
 Displays synchronized Salesforce Cases with assigned priorities and source order references.
 
